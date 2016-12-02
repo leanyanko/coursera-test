@@ -5,18 +5,18 @@
     <script src="angular.min.js"></script>
     <script src="app.js"></script>
     <style>body { font-size: 1.3em; }</style>
-    <title>Name Calculator</title>
+    <title>Dependency Injection</title>
   </head>
-  <body ng-app="NameCalculator">
-    <h1>Name Calculator</h1>
-    <div ng-controller="NameCalculatorController">
+  <body ng-app="DependencyInj">
+    <h1>Test</h1>
+    <div ng-controller="DIController">
       <div>
-        Your name:
+
         <input type="text"
         ng-model="name"
-        ng-keyup="displayNumeric();">
+        ng-blur="upper();">
       </div>
-      <div>Total score: {{totalValue}}</div>
+
     </div>
   </body>
 </html>
