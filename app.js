@@ -1,24 +1,16 @@
 (function () {
 'use strict';
 
-angular.module('DependencyInj', [])
+angular.module('CounterApp', [])
+.controller('CounterController', CounterController);
 
-.controller('DIController', DIController)//['$scope', '$filter', DIController]);
-function DIController ($scope, $filter, $injector) {
-  $scope.name = "Anna";
+CounterController.$inject = ['$scope'];
+function CounterController($scope) {
 
-  $scope.upper = function () {
-    var upCase = $filter('uppercase');
-    $scope.name = upCase($scope.name);
+  $scope.showNumberOfWatchers = function () {
+    console.log('#watchers', $scope.$$watchersCount);
   };
 
-  console.log ($injector.annotate(DIController));
 }
-
-function AnnotateMe(name, job, blah) {
-  return "string";
-}
-
-console.log(DIController.toString())
 
 })();

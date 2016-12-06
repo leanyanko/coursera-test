@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html ng-app='CounterApp'>
   <head>
     <meta charset="utf-8">
     <script src="angular.min.js"></script>
     <script src="app.js"></script>
-    <style>body { font-size: 1.3em; }</style>
-    <title>Dependency Injection</title>
+    <style> body { font-size: 1.2em; }</style>
+    <title>ng-repeat</title>
   </head>
-  <body ng-app="DependencyInj">
-    <h1>Test</h1>
-    <div ng-controller="DIController">
+  <body>
+    <h1>The Digest Cycle</h1>
+    <div ng-controller='CounterController'>
+      <button ng-click="showNumberOfWatchers()">
+        Log # of Watchers</button>
       <div>
 
-        <input type="text"
-        ng-model="name"
-        ng-blur="upper();">
       </div>
-
     </div>
   </body>
 </html>
