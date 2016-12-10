@@ -5,22 +5,16 @@
     <script src="angular.min.js"></script>
     <script src="app.js"></script>
     <style> body { font-size: 1.2em; }</style>
-    <title>ng-repeat</title>
+    <title>The Digest Cycle</title>
   </head>
   <body>
     <h1>The Digest Cycle</h1>
     <div ng-controller='CounterController'>
-      <button ng-click="showNumberOfWatchers()">
-        Log # of Watchers</button><br>
-        <input type="text" ng-model="name">
       <div>
-          <button ng-click="countOnce()">Up Once Counter</button> <br>
-          <button ng-click="upCounter()">Up more</button>
+        <button ng-click="upCounter()">Increment Counter</button>
       </div>
       <div>
-        Once: {{onceCounter}} <br>
-        Counter: {{counter}}
-
+        Regular counter: {{ counter }}
       </div>
     </div>
   </body>
