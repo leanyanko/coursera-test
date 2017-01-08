@@ -5,26 +5,16 @@ angular.module('ShoppingListDirectiveApp', [])
 .controller('ShoppingListController1', ShoppingListController1)
 .controller('ShoppingListController2', ShoppingListController2)
 .factory('ShoppingListFactory', ShoppingListFactory)
-.directive('listItemDescription', ListItemDescription)
-.directive('listItem', ListItem);
+.directive('shoppingList', ShoppingList);
 
-
-function ListItem() {
+function ShoppingList() {
   var ddo = {
-    restrict:'E',
-    templateUrl: 'listItem.html'
+    templateUrl: 'shoppingList.html',
+    scope: {
+      list: '=myList',
+      title: '@title'
+    }
   };
-
-  return ddo;
-}
-
-
-function ListItemDescription() {
-  var ddo = {
-
-    template: '{{ item.quantity }} of {{ item.name }}'
-  };
-
   return ddo;
 }
 
@@ -38,16 +28,20 @@ function ShoppingListController1(ShoppingListFactory) {
   var shoppingList = ShoppingListFactory();
 
   list.items = shoppingList.getItems();
+ var origTitle = 'Shopping List #1';
+ list.title = origTitle + '(' + list.items.length + ' items )';
 
   list.itemName = "";
   list.itemQuantity = "";
 
   list.addItem = function () {
     shoppingList.addItem(list.itemName, list.itemQuantity);
+     list.title = origTitle + '(' + list.items.length + ' items )';
   }
 
   list.removeItem = function (itemIndex) {
     shoppingList.removeItem(itemIndex);
+     list.title = origTitle + '(' + list.items.length + ' items )';
   };
 }
 
