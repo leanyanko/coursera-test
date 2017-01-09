@@ -18,10 +18,46 @@ function ShoppingListDirective() {
     },
     controller: ShoppingListDirectiveController,
     controllerAs: 'list',
-    bindToController: true
+    bindToController: true,
+    link: ShoppingListDirectiveLink
   };
   return ddo;
 }
+
+function ShoppingListDirectiveLink(scope, element, attrs, controller) {
+  console.log('Link scope is ', scope);
+  console.log('Controller scope is ', controller);
+  console.log('Element scope is ', element);
+
+  scope.$watch('list.cookiesInList()', function(newValue, oldValue) {
+    console.log('Old value ', oldValue);
+    console.log('New value ', newValue);
+    if (newValue === true) {
+      displayCookieWarning();
+    }
+    else {
+      removeCookieWarning();
+    }
+  });
+
+  function displayCookieWarning () {
+      // var warnelem = element.find('div');
+      // console.log('warn elem ', warnelem);
+      // warnelem.css('display', 'block');
+      var warningElem = element.find("div.error");
+      warningElem.slideDown(900);
+  }
+
+  function removeCookieWarning () {
+      // var warnelem = element.find('div');
+      // warnelem.css('display', 'none');
+      var warningElem = element.find("div.error");
+      console.log('111warn elem ', warningElem);
+      warningElem.slideUp(1900);
+  }
+}
+
+
 
 function ShoppingListDirectiveController() {
   var list = this;
