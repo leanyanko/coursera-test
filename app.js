@@ -13,13 +13,13 @@ function ShoppingListDirective() {
     scope: {
       items: '<',
       title: '@title',
-      badRemove: '=',
       onRemove: '&'
     },
     controller: ShoppingListDirectiveController,
     controllerAs: 'list',
     bindToController: true,
-    link: ShoppingListDirectiveLink
+    link: ShoppingListDirectiveLink,
+    transclude: true
   };
   return ddo;
 }
@@ -85,6 +85,8 @@ function ShoppingListController(ShoppingListFactory) {
   list.items = shoppingList.getItems();
  var origTitle = 'Shopping List #1';
  list.title = origTitle + '(' + list.items.length + ' items )';
+
+ list.warning = "Cokie!";
 
   list.itemName = "";
   list.itemQuantity = "";
