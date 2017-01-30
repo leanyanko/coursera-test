@@ -1,46 +1,29 @@
 <!DOCTYPE html>
-<html ng-app='ShoppingListDirectiveApp'>
+<html ng-app='ShoppingListComponentApp'>
   <head>
     <meta charset="utf-8">
     <script src="jquery-3.1.0.min.js"></script>
-    <script src="angular.min.js"></script>
+    <script src="angular8.min.js"></script>
     <script src="app.js"></script>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.ico">
-    <title>Directives with Their own Controllers</title>
+    <title>Shopping List With Components</title>
   </head>
   <body>
-    <h1>Directives with Their Own Controllers</h1>
+    <h1>Shopping List With Components</h1>
 
-    <!-- LIST #1 - unlimited items -->
-    <div id="list1" ng-controller='ShoppingListController as list'>
+    <div id="list" ng-controller='ShoppingListController as list'>
       <input type="text" ng-model="list.itemName" placeholder="item name">
       <input type="text" ng-model="list.itemQuantity" placeholder="quantity">
       <button ng-click="list.addItem();">Add Item</button>
       <span>{{ list.lastRemoved }}</span>
-        <shopping-list
-        id="list1"
-        items="list.items"
-        title="{{list.title}}"
-        bad-remove="list.removeItem"
-        on-remove="list.removeItem(index)">
-          <span class="warning">WARNING! {{list.warning}}</span>
-        </shopping-list>
 
-        <shopping-list
-        id="list2"
+      <shopping-list
         items="list.items"
         title="{{list.title}}"
-        bad-remove="list.removeItem"
-        on-remove="list.removeItem(index)">
-          <div>
-            <div class="title">oh, the horror!</div>
-            <div>{{list.warning}}</div>
-          </div>
-        </shopping-list>
+        on-remove="list.removeItem(index)"></shopping-list>
 
     </div>
 
-
+    </div>
   </body>
 </html>

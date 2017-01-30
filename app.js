@@ -1,80 +1,84 @@
 (function () {
 'use strict';
 
-angular.module('ShoppingListDirectiveApp', [])
+angular.module('ShoppingListComponentApp', [])
 .controller('ShoppingListController', ShoppingListController)
 .factory('ShoppingListFactory', ShoppingListFactory)
-.directive('shoppingList', ShoppingListDirective);
-
-
-function ShoppingListDirective() {
-  var ddo = {
+.component('shoppingList', {
     templateUrl: 'shoppingList.html',
-    scope: {
+    controller: ShoppingListComponentController,
+    bindings: {
       items: '<',
-      title: '@title',
+      myTitle: '@title',
       onRemove: '&'
-    },
-    controller: ShoppingListDirectiveController,
-    controllerAs: 'list',
-    bindToController: true,
-    link: ShoppingListDirectiveLink,
-    transclude: true
-  };
-  return ddo;
-}
-
-function ShoppingListDirectiveLink(scope, element, attrs, controller) {
-  console.log('Link scope is ', scope);
-  console.log('Controller scope is ', controller);
-  console.log('Element scope is ', element);
-
-  scope.$watch('list.cookiesInList()', function(newValue, oldValue) {
-    console.log('Old value ', oldValue);
-    console.log('New value ', newValue);
-    if (newValue === true) {
-      displayCookieWarning();
     }
-    else {
-      removeCookieWarning();
-    }
-  });
+});
 
-  function displayCookieWarning () {
-      // var warnelem = element.find('div');
-      // console.log('warn elem ', warnelem);
-      // warnelem.css('display', 'block');
-      var warningElem = element.find("div.error");
-      warningElem.slideDown(900);
-  }
+ShoppingListComponentController.$inject = ['$element'];
+function ShoppingListComponentController($element) {
+  var $ctrl = this;
+  var totalItems;
 
-  function removeCookieWarning () {
-      // var warnelem = element.find('div');
-      // warnelem.css('display', 'none');
-      var warningElem = element.find("div.error");
-      console.log('111warn elem ', warningElem);
-      warningElem.slideUp(1900);
-  }
-}
-
-
-
-function ShoppingListDirectiveController() {
-  var list = this;
-
-  list.cookiesInList = function () {
-    for (var i = 0; i < list.items.length; i++) {
-      var name = list.items[i].name;
+  $ctrl.cookiesInList = function () {
+    for (var i = 0; i < $ctrl.items.length; i++) {
+      var name = $ctrl.items[i].name;
       if (name.toLowerCase().indexOf("cookie") !== -1) {
         return true;
       }
     }
+
     return false;
   };
+
+  $ctrl.remove = function (myIndex) {
+      $ctrl.onRemove({ index:myIndex });
+  };
+
+  $ctrl.$onInit = function () {
+  //  console.log('we are $onInit()');
+    totalItems = 0;
+  //  console.log('totalItems ',totalItems)
+
+  };
+
+  $ctrl.$onChanges = function (changeObj) {
+    console.log('changeObj is ', changeObj);
+  };
+
+  // $ctrl.$postLink = function () {
+  //   $scope.$watch('$ctrl.cookiesInList()', function (newVal, oldVal) {
+  //     console.log('element ',$element)  ;
+  //     if (newVal === true) {
+  //       var warnElem = $element.find('div.error');
+  //       warnElem.slideDown(900);
+  //     }
+  //     else {
+  //       var warnElem = $element.find('div.error');
+  //       warnElem.slideUp(900);
+  //     }
+  //   });
+  // };
+
+
+    $ctrl.$doCheck = function () {
+      if ($ctrl.items.length !== totalItems) {
+        console.log("# of items changed. Checking for Cookies!");
+        totalItems = $ctrl.items.length;
+        if ($ctrl.cookiesInList()) {
+          console.log("Oh, NO! COOKIES!!!!!");
+          var warningElem = $element.find('div.error');
+          warningElem.slideDown(900);
+        }
+        else {
+          console.log("No cookies here. Move right along!");
+          var warningElem = $element.find('div.error');
+          warningElem.slideUp(900);
+        }
+      }
+    };
 }
 
 
-// LIST #1 - controller
 ShoppingListController.$inject = ['ShoppingListFactory'];
 function ShoppingListController(ShoppingListFactory) {
   var list = this;
@@ -83,24 +87,22 @@ function ShoppingListController(ShoppingListFactory) {
   var shoppingList = ShoppingListFactory();
 
   list.items = shoppingList.getItems();
- var origTitle = 'Shopping List #1';
- list.title = origTitle + '(' + list.items.length + ' items )';
-
- list.warning = "Cokie!";
+  var origTitle = "Shopping List #1";
+  list.title = origTitle + " (" + list.items.length + " items )";
 
   list.itemName = "";
   list.itemQuantity = "";
 
   list.addItem = function () {
     shoppingList.addItem(list.itemName, list.itemQuantity);
-     list.title = origTitle + '(' + list.items.length + ' items )';
-  }
+    list.title = origTitle + " (" + list.items.length + " items )";
+  };
 
   list.removeItem = function (itemIndex) {
-    console.log('this is ', this);
-    this.lastRemoved = 'LastRemoved was ' + this.items[itemIndex].name;
+    console.log("'this' is: ", this);
+    this.lastRemoved = "Last item removed was " + this.items[itemIndex].name;
     shoppingList.removeItem(itemIndex);
-     list.title = origTitle + '(' + list.items.length + ' items )';
+    this.title = origTitle + " (" + list.items.length + " items )";
   };
 }
 
