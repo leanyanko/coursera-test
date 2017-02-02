@@ -1,8 +1,9 @@
 (function () {
 'use strict';
 
-angular.module('ShoppingListComponentApp', [])
+angular.module('ShoppingListEventsApp', [])
 .controller('ShoppingListController', ShoppingListController)
+.service('WeightLossFilterService', WeightLossFilterService)
 .factory('ShoppingListFactory', ShoppingListFactory)
 .component('shoppingList', {
     templateUrl: 'shoppingList.html',
@@ -12,69 +13,69 @@ angular.module('ShoppingListComponentApp', [])
       myTitle: '@title',
       onRemove: '&'
     }
+})
+.component('loadingSpinner', {
+  templateUrl: 'spinner.html',
+  controller: SpinnerController
 });
 
-ShoppingListComponentController.$inject = ['$element'];
-function ShoppingListComponentController($element) {
+SpinnerController.$inject = ['$rootScope'];
+function SpinnerController ($rootScope) {
+  var $ctrl = this;
+
+  var cancelListener = $rootScope.$on('shoppinglist:processing', function (event, data) {
+    console.log('Event: ', event);
+    console.log('Data: ', data);
+
+    if (data.on) {
+      $ctrl.showSpinner = true;
+    }
+    else {
+      $ctrl.showSpinner = false;
+    }
+  });
+
+  $ctrl.$onDestroy = function () {
+    cancelListener();
+  }
+
+}
+
+ShoppingListComponentController.$inject = ['$rootScope', '$element', '$q', 'WeightLossFilterService'];
+function ShoppingListComponentController($rootScope, $element, $q, WeightLossFilterService) {
   var $ctrl = this;
   var totalItems;
 
-  $ctrl.cookiesInList = function () {
-    for (var i = 0; i < $ctrl.items.length; i++) {
-      var name = $ctrl.items[i].name;
-      if (name.toLowerCase().indexOf("cookie") !== -1) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-  $ctrl.remove = function (myIndex) {
-      $ctrl.onRemove({ index:myIndex });
-  };
-
-  $ctrl.$onInit = function () {
-  //  console.log('we are $onInit()');
-    totalItems = 0;
-  //  console.log('totalItems ',totalItems)
-
-  };
-
-  $ctrl.$onChanges = function (changeObj) {
-    console.log('changeObj is ', changeObj);
-  };
-
-  // $ctrl.$postLink = function () {
-  //   $scope.$watch('$ctrl.cookiesInList()', function (newVal, oldVal) {
-  //     console.log('element ',$element)  ;
-  //     if (newVal === true) {
-  //       var warnElem = $element.find('div.error');
-  //       warnElem.slideDown(900);
-  //     }
-  //     else {
-  //       var warnElem = $element.find('div.error');
-  //       warnElem.slideUp(900);
-  //     }
-  //   });
-  // };
-
-
     $ctrl.$doCheck = function () {
       if ($ctrl.items.length !== totalItems) {
-        console.log("# of items changed. Checking for Cookies!");
+      //  console.log("# of items changed. Checking for Cookies!");
         totalItems = $ctrl.items.length;
-        if ($ctrl.cookiesInList()) {
-          console.log("Oh, NO! COOKIES!!!!!");
-          var warningElem = $element.find('div.error');
-          warningElem.slideDown(900);
+
+        $rootScope.$broadcast('shoppinglist:processing', {on: true});
+        var promises = [];
+        for (var i = 0; i < $ctrl.items.length; i++) {
+          promises.push(WeightLossFilterService.checkName($ctrl.items[i].name))
         }
-        else {
-          console.log("No cookies here. Move right along!");
+
+        $q.all(promises)
+        .then(function (result) {
+          // Remove cookie warning
           var warningElem = $element.find('div.error');
           warningElem.slideUp(900);
+        })
+        .catch(function (result) {
+          // Show cookie warning
+          var warningElem = $element.find('div.error');
+          warningElem.slideDown(900);
+        })
+        .finally (function () {
+            $rootScope.$broadcast('shoppinglist:processing', {on: false});
+          });
         }
-      }
+      };
+
+      $ctrl.remove = function (myIndex) {
+        $ctrl.onRemove({index: myIndex});
     };
 }
 
@@ -144,6 +145,30 @@ function ShoppingListFactory() {
   };
 
   return factory;
+}
+
+WeightLossFilterService.$inject = ['$q', '$timeout'];
+function  WeightLossFilterService ($q, $timeout) {
+  var service = this;
+
+  service.checkName = function (name) {
+    var deferred = $q.defer();
+    var result = {
+      message: ""
+    };
+
+    $timeout (function () {
+      if (name.toLowerCase().indexOf('cookie') === -1) {
+        deferred.resolve (result);
+      }
+      else {
+        result.message = "stay away from cokie";
+        deferred.reject(result);
+      }
+    }, 3000);
+
+      return deferred.promise;
+  };
 }
 
 })();
