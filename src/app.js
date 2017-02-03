@@ -1,12 +1,12 @@
 (function () {
 'use strict';
 
-angular.module('ShoppingListEventsApp', [])
+angular.module('ShoppingList', [])
 .controller('ShoppingListController', ShoppingListController)
 .service('WeightLossFilterService', WeightLossFilterService)
 .factory('ShoppingListFactory', ShoppingListFactory)
 .component('shoppingList', {
-    templateUrl: 'shoppingList.html',
+    templateUrl: 'src/shoppingList.html',
     controller: ShoppingListComponentController,
     bindings: {
       items: '<',
@@ -15,7 +15,7 @@ angular.module('ShoppingListEventsApp', [])
     }
 })
 .component('loadingSpinner', {
-  templateUrl: 'spinner.html',
+  templateUrl: 'src/spinner.html',
   controller: SpinnerController
 });
 
