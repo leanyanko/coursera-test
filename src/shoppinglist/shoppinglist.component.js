@@ -3,51 +3,10 @@
 
 angular.module('ShoppingList')
 .component('shoppingList', {
-    templateUrl: 'src/shoppinglist/shoppingList.html',
-    controller: ShoppingListComponentController,
+    templateUrl: 'src/shoppinglist/templates/shoppingList.template.html',
     bindings: {
-      items: '<',
-      myTitle: '@title',
-      onRemove: '&'
+      items: '<'
     }
 });
-
-ShoppingListComponentController.$inject = ['$rootScope', '$element', '$q', 'WeightLossFilterService'];
-function ShoppingListComponentController($rootScope, $element, $q, WeightLossFilterService) {
-  var $ctrl = this;
-  var totalItems;
-
-    $ctrl.$doCheck = function () {
-      if ($ctrl.items.length !== totalItems) {
-      //  console.log("# of items changed. Checking for Cookies!");
-        totalItems = $ctrl.items.length;
-
-        $rootScope.$broadcast('shoppinglist:processing', {on: true});
-        var promises = [];
-        for (var i = 0; i < $ctrl.items.length; i++) {
-          promises.push(WeightLossFilterService.checkName($ctrl.items[i].name))
-        }
-
-        $q.all(promises)
-        .then(function (result) {
-          // Remove cookie warning
-          var warningElem = $element.find('div.error');
-          warningElem.slideUp(900);
-        })
-        .catch(function (result) {
-          // Show cookie warning
-          var warningElem = $element.find('div.error');
-          warningElem.slideDown(900);
-        })
-        .finally (function () {
-            $rootScope.$broadcast('shoppinglist:processing', {on: false});
-          });
-        }
-      };
-
-      $ctrl.remove = function (myIndex) {
-        $ctrl.onRemove({index: myIndex});
-    };
-}
 
 })();
