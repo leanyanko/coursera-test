@@ -1,32 +1,44 @@
 (function () {
-  'use strict';
+'use strict';
 
-  angular.module('Spinner')
-  .component('loadingSpinner', {
-    templateUrl: 'src/spinner/spinner.html',
-    controller: SpinnerController
-  });
+angular.module('Spinner')
+.component('loadingSpinner', {
+  templateUrl: 'src/spinner/spinner.html',
+  controller: SpinnerController
+});
 
-  SpinnerController.$inject = ['$rootScope'];
-  function SpinnerController ($rootScope) {
-    var $ctrl = this;
 
-    var cancelListener = $rootScope.$on('shoppinglist:processing', function (event, data) {
-      console.log('Event: ', event);
-      console.log('Data: ', data);
+SpinnerController.$inject = ['$rootScope']
+function SpinnerController($rootScope) {
+  var $ctrl = this;
+  var cancellers = [];
 
-      if (data.on) {
-        $ctrl.showSpinner = true;
-      }
-      else {
-        $ctrl.showSpinner = false;
-      }
+  $ctrl.$onInit = function () {
+    var cancel = $rootScope.$on('$stateChangeStart',
+    function(event, toState, toParams, fromState, fromParams, options){
+      $ctrl.showSpinner = true;
     });
+    cancellers.push(cancel);
 
-    $ctrl.$onDestroy = function () {
-      cancelListener();
-    }
+    cancel = $rootScope.$on('$stateChangeSuccess',
+    function(event, toState, toParams, fromState, fromParams){
+      $ctrl.showSpinner = false;
+    });
+    cancellers.push(cancel);
 
-  }
+    cancel = $rootScope.$on('$stateChangeError',
+    function(event, toState, toParams, fromState, fromParams, error){
+      $ctrl.showSpinner = false;
+    });
+    cancellers.push(cancel);
+  };
+
+  $ctrl.$onDestroy = function () {
+    cancellers.forEach(function (item) {
+      item();
+    });
+  };
+
+};
 
 })();
